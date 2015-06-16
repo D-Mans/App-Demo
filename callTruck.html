@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title></title>
+    <script src="js/mui.min.js"></script>
+    <link href="css/mui.min.css" rel="stylesheet"/>
+    <script type="text/javascript" charset="utf-8">
+    var ws;
+    function WSonOpen() {
+//          lockOff();
+//          Log("连接已经建立。", "OK");
+//          $("#SendDataContainer").show();
+   			   // ws.send("login:mobile" );
+   			 //   ws.close();
+   			 var login={
+      			Type:0,
+      			Latitude:1,
+      			Longitude:1,
+      			UserId:'owner'
+      		}
+      		ws.send(JSON.stringify(login));
+        };
+
+        function WSonMessage(event) {
+//          Log(event.data); 
+            var msg = JSON.parse((event.data));
+            if(msg){
+            	switch(msg.Type)
+            	{
+            		case 2:
+            		
+            		mui.toast(msg.Status);
+            		break;
+            		default:break;
+            	}
+            }
+        };
+
+        function WSonClose() {
+//          lockOff();
+//
+//
+//          document.getElementById("ToggleConnection").innerHTML = "连接";
+//          $("#SendDataContainer").hide();
+        };
+
+        function WSonError() {
+//          lockOff();
+//          Log("远程连接中断。", "ERROR");
+        };
+      	mui.init();
+      	mui.plusReady(function(){
+      		try {
+                    if ("WebSocket" in window) {
+                    	ws = new WebSocket("ws://192.168.1.8:4142");
+                    }
+                    else if("MozWebSocket" in window) {
+                    	ws = new MozWebSocket("ws://192.168.1.8:4142");
+                    }
+                    
+                    SocketCreated = true;
+                    isUserloggedout = false;
+                } catch (ex) {
+                    //Log(ex, "ERROR");
+                    return;
+                }
+                
+                ws.onopen = WSonOpen;
+                ws.onmessage = WSonMessage;
+                ws.onclose = WSonClose;
+                ws.onerror = WSonError;
+      		document.getElementById('btnCallTruck').addEventListener('tap',function(){
+      			var req = {
+      				Type:'1',
+      				From:'龙东大道3000号10号楼',
+      				To:'上海闵行Infosys园区',
+      				When:'现在',
+      				State:'new'
+      			};
+      			ws.send(JSON.stringify(req));
+      		},false);
+      		
+      	});
+      	
+      	
+    </script>
+</head>
+<body>
+	<div class="mui-content">
+		<button class="mui-btn mui-btn-positive mui-btn-block" id="btnCallTruck">开始叫车</button>
+		<button class="mui-btn mui-btn-positive mui-btn-block" id="btnReserver">预约用车</button>
+
+	</div>
+</body>
+</html>

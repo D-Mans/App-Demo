@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html style="height: 100%;">
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title></title>
+		<script src="js/mui.min.js"></script>
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<style>
+			body,
+			html,
+			{
+				width: 100%;
+				height: 100%;
+				overflow: hidden;
+				margin: 0;
+			}
+			@media all and (orientation: portrait) {
+				.map {
+					height: 80% !important;
+				}
+			}
+			@media all and (orientation: landscape) {
+				.map {
+					height: 60% !important;
+				}
+			}
+		</style>
+		<!--<script type="text/javascript" src="http://api.map.baidu.com/api?type=quick&ak=L6Tvnsi2p1cx1QhbLSEHCElu&v=1.0"></script>-->
+		<script type="text/javascript" charset="utf-8">
+			var latitude, longitude;
+			mui.init();
+			 //			mui.plusReady(function() {
+			 //				plus.geolocation.getCurrentPosition(function(p) {
+			 //					//alert("Geolocation\nLatitude:" + p.coords.latitude + "\nLongitude:" + p.coords.longitude + "\nAltitude:" + p.coords.altitude);
+			 //					latitude = p.coords.latitude;
+			 //					longitude = p.coords.longitude;
+			 //					initMap();
+			 //					plus.geolocation.watchPosition(function(p) {
+			 //						//alert("w Geolocation\nLatitude:" + p.coords.latitude + "\nLongitude:" + p.coords.longitude + "\nAltitude:" + p.coords.altitude);
+			 //						//latitude = p.coords.latitude;
+			 //						//longitude = p.coords.longitude;
+			 //						updateMap(p.coords.latitude, p.coords.longitude);
+			 //					}, function(e) {
+			 //						alert("Geolocation error: " + e.message);
+			 //					});
+			 //				}, function(error) {
+			 //					alert("Geolocation error: " + error.message);
+			 //				}, {
+			 //					provider: 'baidu',
+			 //					coordsType: 'gcj02'
+			 //				});
+			 //			});
+			var em = null,
+				map = null;
+			 // H5 plus事件处理
+			function plusReady() {
+				if (!em || map) {
+					return
+				};
+				map = new plus.maps.Map("map");
+				map.getUserLocation(function(state, point) {
+					if (0 == state) {
+						//alert("Current Position:" + point.getLng() + "," + point.getLat());
+						var point = new plus.maps.Point(point.getLng(), point.getLat());
+						map.centerAndZoom(point, 18);
+						//map.showUserLocation(true);
+						var marker = new plus.maps.Marker(point);
+						marker.setIcon("/mapmarker.png");
+						//marker.setLabel("You'e");
+						var bubble = new plus.maps.Bubble("打造最好的HTML5移动开发工具");
+						marker.setBubble(bubble);
+						map.addOverlay(marker);
+					} else {
+						alert("无法获取当前位置");
+					}
+				});
+				document.getElementById('btnCallTruck').addEventListener('tap', function() {
+					if (plus.storage.getLength() < 1 || plus.storage.getItem('authenticated') != 'true') {
+						//						mui.openWindow({
+						//						url: 'login.html',
+						//						id: 'login',
+						//						styles: {
+						//							top: '45px', //mui标题栏默认高度为45px；
+						//							//bottom: '45px' //默认为0px，可不定义；
+						//						}
+						//					});
+						var loginvw = plus.webview.getWebviewById('login');
+						if (!loginvw) {
+							loginvw = plus.webview.create('login.html','login',{top: '45px'},{});
+						}
+						
+						loginvw.addEventListener('close',function(){
+							plus.webview.create('login.html','login',{top: '45px'},{});
+						});
+						loginvw.show();
+					}
+				});
+				//createMarker();
+				//var marker = new plus.maps.Marker(point2);
+				//marker.setIcon("/logo.png");
+				//marker.setLabel("HBuilder");
+				//var bubble = new plus.maps.Bubble("打造最好的HTML5移动开发工具");
+				//marker.setBubble(bubble);
+				//map.addOverlay(marker);
+			}
+			
+			mui.plusReady(function() {
+				em = document.getElementById("map");
+				plusReady();
+			});
+		</script>
+	</head>
+
+	<body style="height: 100%;">
+		<!--百度地图容器-->
+		<div class="mui-content" style="height: 100%;">
+			<div id="map" class="map"></div>
+			<div style="padding:10px; min-height: 42px;">
+				<div style="display: inline;float: left;width: 45%;">
+					<button class="mui-btn mui-btn-positive mui-btn-block" id="btnCallTruck">开始叫车</button>
+				</div>
+				<div style="display: inline;float: right;width: 45%;">
+					<button class="mui-btn mui-btn-positive mui-btn-block" id="btnReserver">预约用车</button>
+				</div>
+
+			</div>
+
+		</div>
+
+	</body>
+	<script type="text/javascript">
+		 //创建和初始化地图函数：
+		function initMap() {
+			createMap(); //创建地图
+			setMapEvent(); //设置地图事件
+			addMapControl(); //向地图添加控件
+			addMapOverlay(); //向地图添加覆盖物
+		}
+
+		function updateMap(latitude, longitude) {
+			var point = new BMap.Point(longitude, latitude);
+			if (map) {
+				map.panTo(point);
+			}
+		}
+
+		function createMap() {
+			if (!map) {
+				map = new BMap.Map("map");
+				var point = new BMap.Point(longitude, latitude);
+				map.centerAndZoom(point, 15);
+				var marker = new BMap.Marker(point);
+				map.addOverlay(marker);
+			}
+		}
+
+		function setMapEvent() {
+			//map.enableScrollWheelZoom();
+			//map.enableKeyboard();
+			//map.enableDragging();
+			//map.enableDoubleClickZoom()
+		}
+
+		function addClickHandler(target, window) {
+			target.addEventListener("click", function() {
+				target.openInfoWindow(window);
+			});
+		}
+
+		function addMapOverlay() {}
+			//向地图添加控件
+
+		function addMapControl() {
+			//			var scaleControl = new BMap.ScaleControl({
+			//				anchor: BMAP_ANCHOR_BOTTOM_LEFT
+			//			});
+			//			scaleControl.setUnit(BMAP_UNIT_IMPERIAL);
+			//			map.addControl(scaleControl);
+			//			var navControl = new BMap.NavigationControl({
+			//				anchor: BMAP_ANCHOR_TOP_LEFT,
+			//				type: BMAP_NAVIGATION_CONTROL_LARGE
+			//			});
+			//			map.addControl(navControl);
+			//			var overviewControl = new BMap.OverviewMapControl({
+			//				anchor: BMAP_ANCHOR_BOTTOM_RIGHT,
+			//				isOpen: true
+			//			});
+			//			map.addControl(overviewControl);
+		}
+		var map;
+	</script>
+
+</html>
